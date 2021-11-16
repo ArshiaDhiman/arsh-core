@@ -6,7 +6,12 @@ module.exports = {
   /*
    * $ truffle test --network <network-name>
    */
-
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: process.env.MY_API_KEY
+  },
   networks: {
     development: {
       host: "127.0.0.1", // Localhost (default: none)
