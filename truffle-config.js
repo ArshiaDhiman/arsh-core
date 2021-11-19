@@ -6,16 +6,14 @@ module.exports = {
   /*
    * $ truffle test --network <network-name>
    */
-  plugins: [
-    'truffle-plugin-verify'
-  ],
+  plugins: ["truffle-plugin-verify", "solidity-coverage"],
   api_keys: {
-    etherscan: process.env.MY_API_KEY
+    etherscan: process.env.MY_API_KEY,
   },
   networks: {
     development: {
       host: "127.0.0.1", // Localhost (default: none)
-      port: 8545, 
+      port: 9545,
       network_id: "*", // Any network (default: none)
     },
     rinkeby: {
@@ -24,7 +22,7 @@ module.exports = {
           process.env.MNEMONIC,
           `https://rinkeby.infura.io/v3/50e24ade08ae4228ae11260eff99b489`
         ),
-      network_id: 4, // Ropsten's id
+      network_id: 4, //
     },
   },
 
@@ -36,7 +34,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.9", 
+      version: "0.8.9",
     },
   },
 
