@@ -6,5 +6,10 @@ module.exports = async function (deployer) {
 
   const token = await ARSHToken.deployed();
 
-  await deployer.deploy(Faucet, token.address, "3600", "1000000000");
+  await deployer.deploy(
+    Faucet,
+    token.address,
+    "3600",
+    "10000000000000000000000"
+  );
 };
