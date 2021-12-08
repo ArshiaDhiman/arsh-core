@@ -1,8 +1,8 @@
 const Faucet = artifacts.require("Faucet");
 const ARSHToken = artifacts.require("ARSHToken");
 const { expectRevert } = require("@openzeppelin/test-helpers");
-const transferAmount = "1000000000";
-const moneyForFaucet = "100000000000000000000000";
+const transferAmount = "10000000000000000000000";
+const moneyForFaucet = "100000000000000000000000000";
 
 contract("Faucet", (accounts) => {
   before(async () => {
