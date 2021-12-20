@@ -2,6 +2,7 @@ const { expectRevert, time } = require("@openzeppelin/test-helpers");
 const { assert } = require("chai");
 const year = 31536000;
 const halfYear = 15768000;
+const quarterYear = 7884000;
 /* 
   Staking pool
     an array of StakingPool structs
@@ -9,8 +10,8 @@ const halfYear = 15768000;
     Struct should have lock period, total staked, mapping of      stakers (amount/deposit time)
 
   Staker
-    struct for user in staking pools
-     should have amount staked and last time staked
+      struct for user in staking pools
+      should have amount staked and last time staked
 
   addPool -
       should add a new staking pool
@@ -49,6 +50,7 @@ contract("Staking", (accounts) => {
     await this.token.transfer(this.staking.address, "1000000000000");
     await this.token.transfer(accounts[1], "10000000");
     await this.token.transfer(accounts[2], "10000000");
+    await this.token.transfer(accounts[3], "10000000");
     await this.token.approve(
       this.staking.address,
       "1000000000000000000000000000000000000000000"
@@ -63,15 +65,20 @@ contract("Staking", (accounts) => {
       "1000000000000000000000000000000000000000000",
       { from: accounts[2] }
     );
+    await this.token.approve(
+      this.staking.address,
+      "1000000000000000000000000000000000000000000",
+      { from: accounts[3] }
+    );
   });
 
   describe("addPool", async () => {
     it("should add a pool", async () => {
       const lengthBefore = await this.staking.getPoolsLength();
 
-      await this.staking.addPool(31536000, 40);
+      await this.staking.addPool("pool 1", 31536000, 40);
 
-      await this.staking.addPool(15768000, 30);
+      await this.staking.addPool("pool 2", 15768000, 30);
 
       const lengthAfter = await this.staking.getPoolsLength();
 
@@ -79,7 +86,7 @@ contract("Staking", (accounts) => {
     });
 
     it("should update pool after pool has been made ", async () => {
-      await this.staking.setPools(0, 30, 31536000);
+      await this.staking.setPools(0, "pool 1.1", 30, 31536000);
 
       const pools = await this.staking.getPools();
 
@@ -157,6 +164,37 @@ contract("Staking", (accounts) => {
       const balAfter = await this.token.balanceOf(accounts[2]);
 
       assert.equal(balAfter.sub(balBefore).toString(), 795);
+    });
+
+    it("should update totalStaked when someone unstake", async () => {
+      await this.staking.stake(1000, 0, { from: accounts[2] });
+
+      const balBefore = await this.staking.getPoolTotalStaked(0);
+
+      await time.increase(year);
+
+      await this.staking.unstake(0, { from: accounts[2] });
+
+      const balAfter = await this.staking.getPoolTotalStaked(0);
+
+      assert.equal(balBefore.sub(balAfter).toString(), 1300);
+    });
+
+    it("a user should not be able to unstake tokens till lockperiod is over", async () => {
+      await this.staking.stake(1000, 0, { from: accounts[3] });
+
+      // const balBefore = await this.token.balanceOf(accounts[3]);
+
+      // await time.increase(quarterYear);
+
+      await expectRevert(
+        this.staking.unstake(0, { from: accounts[3] }),
+        "user must wait till lock period is done"
+      );
+
+      // const balAfter = await this.token.balanceOf(accounts[3]);
+
+      // assert.equal(balAfter, balBefore);
     });
   });
 });

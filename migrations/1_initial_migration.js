@@ -16,3 +16,5 @@ module.exports = async function (deployer) {
 
   await deployer.deploy(Staking, token.address);
 };
+
+// 0xe4aa457d296b896451617f6c83468f3691e0aba4
